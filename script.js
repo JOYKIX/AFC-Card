@@ -270,7 +270,7 @@ const cardData = {
   "C": 25,
   "D": 39,
   "cards": [
-    {"id": 0, "rarity": "C"},
+    {"id": 0, "rarity": "Splus"},
     {"id": 1, "rarity": "A"},
     {"id": 2, "rarity": "SPlus"},
     {"id": 3, "rarity": "D"},
@@ -294,7 +294,7 @@ const cardData = {
     {"id": 21, "rarity": "S"},
     {"id": 22, "rarity": "B"},
     {"id": 23, "rarity": "B"},
-	{"id": 24, "rarity": "A"},
+    {"id": 24, "rarity": "A"},
     {"id": 25, "rarity": "D"},
     {"id": 26, "rarity": "D"},
     {"id": 27, "rarity": "SSS"},
@@ -320,6 +320,6 @@ const cardData = {
     {"id": 47, "rarity": "S"},
     {"id": 48, "rarity": "B"},
     {"id": 49, "rarity": "S"},
-	{"id": 50, "rarity": "SSS"},
+    {"id": 50, "rarity": "SSS"},
   ]
 };
