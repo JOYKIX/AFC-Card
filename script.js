@@ -270,7 +270,7 @@ const cardData = {
   "C": 25,
   "D": 39,
   "cards": [
-    {"id": 0, "rarity": "Splus"},
+    {"id": 0, "rarity": "SSS"},
     {"id": 1, "rarity": "A"},
     {"id": 2, "rarity": "SPlus"},
     {"id": 3, "rarity": "D"},
