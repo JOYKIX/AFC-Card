@@ -48,17 +48,17 @@ function openBooster() {
             const rarityRoll = Math.random() * 100; // Roll de rareté de 0 à 100
 
             let rarity;
-            if (rarityRoll <= 0.1) {
+            if (rarityRoll <= 0.04) {
                 rarity = 'SSS';
-            } else if (rarityRoll <= 1.1) {
+            } else if (rarityRoll <= 0.44) {
                 rarity = 'SPlus';
-            } else if (rarityRoll <= 6.1) {
+            } else if (rarityRoll <= 4.24) {
                 rarity = 'S';
-            } else if (rarityRoll <= 16.1) {
+            } else if (rarityRoll <= 13.84) {
                 rarity = 'A';
-            } else if (rarityRoll <= 36.1) {
+            } else if (rarityRoll <= 33.04) {
                 rarity = 'B';
-            } else if (rarityRoll <= 61.1) {
+            } else if (rarityRoll <= 61.73) {
                 rarity = 'C';
             } else {
                 rarity = 'D';
@@ -262,13 +262,13 @@ function updateFlowerOfHibiscusDisplay() {
 });
 
 const cardData = {
-  "SSS": 0.1,
-  "SPlus": 1,
-  "S": 5,
-  "A": 10,
-  "B": 20,
-  "C": 25,
-  "D": 39,
+  "SSS": 0.04,
+  "SPlus": 0.4,
+  "S": 3.8,
+  "A": 9.6,
+  "B": 19.2,
+  "C": 28.7,
+  "D": 38.3,
   "cards": [
     {"id": 0, "rarity": "SSS"},
     {"id": 1, "rarity": "A"},
