@@ -1,185 +1,21 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const boosterContainer = document.getElementById('boosterContainer');
-    const albumContainer = document.getElementById('albumContainer');
-    const openBoosterBtn = document.getElementById('openBoosterBtn');
-    const totalCardsIndicator = document.getElementById('totalCardsIndicator');
-    const boosterCounter = document.getElementById('counterValue'); // Nouveau compteur
-
-    // Stocker le nombre total de cartes possédées dans un objet
-    const totalCardCount = {};
-
-    openBoosterBtn.addEventListener('click', openBooster);
-	const sellDuplicatesBtn = document.getElementById('sellDuplicatesBtn');
-    sellDuplicatesBtn.addEventListener('click', sellDuplicates);
-
-function openBooster() {
-    // Vérifier si le solde est suffisant pour acheter un booster
-    if (flowerOfHibiscus >= boosterCost) {
-        // Déduire le coût du booster du solde de la monnaie virtuelle
-        flowerOfHibiscus -= boosterCost;
-        
-        boosterContainer.innerHTML = ""; // Effacer les cartes actuelles du booster
-
-        const cardIndexes = generateRandomIndexes(5); // Générer 5 indexes aléatoires
-        for (let i = 0; i < 5; i++) {
-            const cardIndex = cardIndexes[i];
-            const card = createCard(cardIndex);
-            boosterContainer.appendChild(card);
-
-            // Ajouter la classe 'opened' pour déclencher l'animation
-            setTimeout(() => {
-                card.classList.add('opened');
-                // Ajouter la carte à l'album lorsqu'elle est ouverte
-                addToAlbum(cardIndex);
-            }, i * 100);
-        }
-    } else {
-        alert("Solde insuffisant pour acheter un booster.");
-    }
-    
-    // Mettre à jour l'affichage du solde de la monnaie virtuelle
-    updateFlowerOfHibiscusDisplay();
-}
-	
-	// Fonction pour générer des indexes aléatoires avec probabilités de rareté
-    function generateRandomIndexes(numCards) {
-        const indexes = [];
-        for (let i = 0; i < numCards; i++) {
-            const rarityRoll = Math.random() * 100; // Roll de rareté de 0 à 100
-
-            let rarity;
-            if (rarityRoll <= 0.04) {
-                rarity = 'SSS';
-            } else if (rarityRoll <= 0.44) {
-                rarity = 'SPlus';
-            } else if (rarityRoll <= 4.24) {
-                rarity = 'S';
-            } else if (rarityRoll <= 13.84) {
-                rarity = 'A';
-            } else if (rarityRoll <= 33.04) {
-                rarity = 'B';
-            } else if (rarityRoll <= 61.73) {
-                rarity = 'C';
-            } else {
-                rarity = 'D';
-            }
-
-            // Filtrer les cartes de cette rareté et en choisir une au hasard
-            const filteredCards = cardData.cards.filter(card => card.rarity === rarity);
-            const randomIndex = Math.floor(Math.random() * filteredCards.length);
-
-            indexes.push(filteredCards[randomIndex].id);
-        }
-        return indexes;
-    }
-
-
-    // Fonction pour créer une carte avec l'index donné
-    function createCard(cardIndex) {
-        const card = document.createElement('div');
-        card.classList.add('card');
-        card.setAttribute('draggable', 'true'); // Rend la carte draggable
-
-        card.dataset.cardIndex = cardIndex; // Ajoute un attribut de données pour stocker l'index
-
-        const cardInner = document.createElement('div');
-        cardInner.classList.add('card-inner');
-
-        const cardFace = document.createElement('div');
-        cardFace.classList.add('card-face');
-        cardFace.style.backgroundImage = `url('Card${cardIndex} (Front).jpg')`;
-
-        const cardBack = document.createElement('div');
-        cardBack.classList.add('card-back');
-        cardBack.style.backgroundImage = `url('Card${cardIndex} (Back).jpg')`;
-
-        cardInner.appendChild(cardFace);
-        cardInner.appendChild(cardBack);
-        card.appendChild(cardInner);
-
-        // Ajouter des gestionnaires d'événements pour le glisser-déposer
-        card.addEventListener('dragstart', handleDragStart);
-
-        return card;
-    }
-
-    // Fonction pour ajouter une carte à l'album
-    function addToAlbum(cardIndex) {
-        // Vérifier si la carte est déjà présente dans l'album
-        if (totalCardCount[cardIndex]) {
-            // Si oui, augmenter le nombre total de cartes possédées
-            totalCardCount[cardIndex]++;
-            // Mettre à jour le texte pour refléter le nombre total de cartes
-            updateAlbumCardText(cardIndex);
-        } else {
-            // Si non, initialiser le nombre total de cartes possédées à 1
-            totalCardCount[cardIndex] = 1;
-            // Ajouter la carte à l'album
-            createAlbumCard(cardIndex);
-        }
-
-        // Trier l'album après chaque ajout
-        sortAlbum();
-    }
-
-    // Fonction pour trier les cartes dans l'album par ordre croissant
-    function sortAlbum() {
-        const albumCards = Array.from(albumContainer.children);
-        albumCards.sort((a, b) => {
-            const indexA = parseInt(a.id.split('_')[1]);
-            const indexB = parseInt(b.id.split('_')[1]);
-            return indexA - indexB;
-        });
-
-        // Retirer toutes les cartes de l'album
-        albumContainer.innerHTML = "";
-
-        // Ajouter les cartes triées à l'album
-        albumCards.forEach(card => {
-            albumContainer.appendChild(card);
-        });
-
-        // Mettre à jour l'indicateur total après le tri
-        updateTotalCardsIndicator();
-    }
-
-    // Fonction pour mettre à jour le texte sur la carte de l'album et l'indicateur total
-    function updateAlbumCardText(cardIndex) {
-        const albumCard = document.getElementById(`albumCard_${cardIndex}`);
-        // Mettre à jour le texte pour refléter le nombre total de cartes
-        albumCard.textContent = `${cardIndex} x${totalCardCount[cardIndex]}`;
-
-        // Mettre à jour l'indicateur total
-        updateTotalCardsIndicator();
-    }
-	
-	// Fonction pour mettre à jour l'indicateur total
-    function updateTotalCardsIndicator() {
-        const uniqueCardsCount = Object.keys(totalCardCount).length;
-        totalCardsIndicator.textContent = `Total : ${uniqueCardsCount} / 50 cartes`;
-    }
-
     // Fonction pour créer une carte dans l'album
     function createAlbumCard(cardIndex) {
-        // Utiliser la face avant de la carte si c'est la face arrière qui est dropée
-        const cardFace = document.createElement('div');
-        cardFace.classList.add('album-card-face');
-        cardFace.style.backgroundImage = `url('Card${cardIndex} (Front).jpg')`;
-
         // Créer la carte de l'album
         const albumCard = document.createElement('div');
         albumCard.classList.add('album-card');
         albumCard.id = `albumCard_${cardIndex}`;
-        albumCard.appendChild(cardFace);
 
         // Ajouter l'image de la carte dans l'album
         const cardImage = new Image();
         cardImage.src = `Card${cardIndex} (Front).jpg`;
-        cardImage.alt = `Card ${cardIndex}`;
+        cardImage.classList.add('album-card-image');
         albumCard.appendChild(cardImage);
 
-        // Afficher le nombre total de cartes possédées
-        albumCard.textContent = `${cardIndex} x${totalCardCount[cardIndex]}`;
+        // Ajouter le compteur du nombre de cartes
+        const cardCount = document.createElement('div');
+        cardCount.classList.add('card-count');
+        cardCount.textContent = `x${totalCardCount[cardIndex]}`;
+        albumCard.appendChild(cardCount);
 
         albumContainer.appendChild(albumCard);
     }
@@ -198,12 +34,12 @@ function openBooster() {
         const cardIndex = event.dataTransfer.getData('text/plain');
         addToAlbum(cardIndex);
     }
-	
-	// Monnaie virtuelle
-let flowerOfHibiscus = 500;
 
-   // Coût d'un booster
-const boosterCost = 50;
+    // Monnaie virtuelle
+    let flowerOfHibiscus = 500;
+
+    // Coût d'un booster
+    const boosterCost = 50;
 
 // Fonction pour vendre les cartes en double à l'agent virtuel
 function sellDuplicates() {
@@ -212,10 +48,13 @@ function sellDuplicates() {
             const sellingPrice = calculateSellingPrice(cardIndex);
             flowerOfHibiscus += sellingPrice * (totalCardCount[cardIndex] - 1);
 
+            // Sauvegarder le nombre total de cartes restantes après la vente
+            const remainingCount = totalCardCount[cardIndex] - 1;
+
             // Soustraire le nombre de cartes vendues du total
             totalCardCount[cardIndex] = 1;
 
-            // Mettre à jour le texte pour refléter le nombre total de cartes
+            // Mettre à jour le texte pour refléter le nombre total de cartes restantes
             updateAlbumCardText(cardIndex);
         }
     }
@@ -224,41 +63,40 @@ function sellDuplicates() {
     updateFlowerOfHibiscusDisplay();
 }
 
-// Fonction pour calculer le prix de vente d'une carte en fonction de sa rareté
-function calculateSellingPrice(cardIndex) {
-    const rarity = getCardRarity(cardIndex);
-    switch (rarity) {
-        case 'SSS':
-            return 100;
-        case 'SPlus':
-            return 75;
-        case 'S':
-            return 50;
-        case 'A':
-            return 25;
-        case 'B':
-            return 15;
-        case 'C':
-            return 10;
-        case 'D':
-            return 5;
-        default:
-            return 0;
+    // Fonction pour calculer le prix de vente d'une carte en fonction de sa rareté
+    function calculateSellingPrice(cardIndex) {
+        const rarity = getCardRarity(cardIndex);
+        switch (rarity) {
+            case 'SSS':
+                return 100;
+            case 'SPlus':
+                return 75;
+            case 'S':
+                return 50;
+            case 'A':
+                return 25;
+            case 'B':
+                return 15;
+            case 'C':
+                return 10;
+            case 'D':
+                return 5;
+            default:
+                return 0;
+        }
     }
-}
 
-// Fonction pour récupérer la rareté d'une carte en fonction de son index
-function getCardRarity(cardIndex) {
-    const card = cardData.cards.find(card => card.id === parseInt(cardIndex));
-    return card ? card.rarity : '';
-}
+    // Fonction pour récupérer la rareté d'une carte en fonction de son index
+    function getCardRarity(cardIndex) {
+        const card = cardData.cards.find(card => card.id === parseInt(cardIndex));
+        return card ? card.rarity : '';
+    }
 
-// Fonction pour mettre à jour l'affichage du solde de la monnaie virtuelle
-function updateFlowerOfHibiscusDisplay() {
-    const flowerOfHibiscusDisplay = document.getElementById('flowerOfHibiscusDisplay');
-    flowerOfHibiscusDisplay.textContent = `Fleur de Bissap : ${flowerOfHibiscus}`;
-}
-
+    // Fonction pour mettre à jour l'affichage du solde de la monnaie virtuelle
+    function updateFlowerOfHibiscusDisplay() {
+        const flowerOfHibiscusDisplay = document.getElementById('flowerOfHibiscusDisplay');
+        flowerOfHibiscusDisplay.textContent = `Fleur de Bissap : ${flowerOfHibiscus}`;
+    }
 });
 
 const cardData = {
